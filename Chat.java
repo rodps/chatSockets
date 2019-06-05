@@ -9,6 +9,8 @@ import java.util.Scanner;
 public class Chat
 {
     static ArrayList<String> pessoas = new ArrayList<>();
+    static String meuApelido = "";
+
     public static void main(String[] args)
     {
         try(MulticastSocket mSocket = new MulticastSocket(6789))
@@ -30,8 +32,7 @@ public class Chat
                 switch(msg[0]) {
                     case "JOIN ": {
                         mSocket.joinGroup(group);
-                        System.out.println("Você entrou no chat.");
-                        pessoas.add(msg[1]);
+                        meuApelido = msg[1];
                         buffer = msg[0]+"["+msg[1]+"]";
                         DatagramPacket d = new DatagramPacket(buffer.getBytes(), buffer.length(),
                                                                 group, 6789);
@@ -97,20 +98,18 @@ class ReceiveMulticast extends Thread
                 String[] msg = new String(p.getData(), 0, p.getLength()).split("\\[|\\]");
                 switch(msg[0]) {
                     case "JOIN ": {
-                        Chat.pessoas.add(msg[1]);
                         System.out.println(msg[1] + " entrou no chat.");
-                        String buffer = "JOINACK " + "[" + msg[1] +"]";
+                        String buffer = "JOINACK " + "[" + Chat.meuApelido +"]";
                         DatagramPacket p2 = new DatagramPacket(buffer.getBytes(), buffer.length(),
                                                                 p.getAddress(), 6799);
                         d.send(p2);
                         break;
                     }
                     case "MSG ": {
-                        System.out.println(msg[0] + msg[1]);
+                        System.out.println("[" + msg[1] + "]: " + msg[2]);
                         break;
                     }
                 }
-                System.out.println(new String(p.getData(), 0, p.getLength()));
             } catch(IOException ioe) {
                 ioe.printStackTrace();
                 System.exit(1);
@@ -133,7 +132,13 @@ class ReceiveUnicast extends Thread {
         try {
             while(true) {
                 s.receive(p);
-                System.out.println(new String(p.getData(), 0, p.getLength()));
+                System.out.println(p.getAddress());
+                String[] msg = new String(p.getData(), 0, p.getLength()).split("\\[|\\]");
+                switch(msg[0]) {
+                    case "JOINACK ": {
+                        Chat.pessoas.add(msg[1]);
+                    }
+                }
             }
         } catch(IOException ioe) {
             ioe.printStackTrace();
