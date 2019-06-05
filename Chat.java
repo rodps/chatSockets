@@ -17,6 +17,11 @@ public class Chat
             Scanner scanner = new Scanner(System.in);
             InetAddress group = InetAddress.getByName("225.1.2.3");
 
+            ReceiveMulticast receiveMulticast = new ReceiveMulticast(mSocket, dSocket);
+            ReceiveUnicast receiveUnicast = new ReceiveUnicast(dSocket);
+            receiveMulticast.start();
+            receiveUnicast.start();
+
             System.out.println("Digite JOIN [apelido] para entrar no chat.");
 
             while(true) {
