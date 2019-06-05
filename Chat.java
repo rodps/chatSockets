@@ -24,7 +24,8 @@ public class Chat
                 String buffer = "";
                 switch(msg[0]) {
                     case "JOIN ": {
-                        System.out.println(msg[1] + " entrou no chat.");
+                        mSocket.joinGroup(group);
+                        System.out.println("Você entrou no chat.");
                         pessoas.add(msg[1]);
                         buffer = msg[0]+"["+msg[1]+"]";
                         DatagramPacket d = new DatagramPacket(buffer.getBytes(), buffer.length(),
