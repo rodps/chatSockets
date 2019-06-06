@@ -99,7 +99,6 @@ class ReceiveMulticast extends Thread
                 switch(msg[0]) {
                     case "JOIN ": {
                         System.out.println(msg[1] + " entrou no chat.");
-                        // Chat.pessoas.add(msg[1]);
                         String buffer = "JOINACK " + "[" + Chat.meuApelido +"]";
                         DatagramPacket p2 = new DatagramPacket(buffer.getBytes(), buffer.length(),
                                                                 p.getAddress(), 6799);
@@ -137,6 +136,7 @@ class ReceiveUnicast extends Thread {
                 String[] msg = new String(p.getData(), 0, p.getLength()).split("\\[|\\]");
                 switch(msg[0]) {
                     case "JOINACK ": {
+                        System.out.println("joinack");
                         Chat.pessoas.add(msg[1]);
                     }
                 }
