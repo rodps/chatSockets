@@ -98,6 +98,7 @@ class ReceiveMulticast extends Thread
                 String[] msg = new String(p.getData(), 0, p.getLength()).split("\\[|\\]");
                 switch(msg[0]) {
                     case "JOIN ": {
+                        Chat.pessoas.add(msg[1]);
                         System.out.println(msg[1] + " entrou no chat.");
                         String buffer = "JOINACK " + "[" + Chat.meuApelido +"]";
                         DatagramPacket p2 = new DatagramPacket(buffer.getBytes(), buffer.length(),
