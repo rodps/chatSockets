@@ -4,11 +4,12 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Scanner;
 
 public class Chat
 {
-    static ArrayList<String> pessoas = new ArrayList<>();
+    static HashMap<String, InetAddress> pessoas = new HashMap<>();
     static String meuApelido = "";
 
     public static void main(String[] args)
@@ -46,10 +47,10 @@ public class Chat
                         mSocket.send(d);
                         break;
                     }
-                    case "MSGIDV FROM ": {
-                        buffer = msg[0]+"["+msg[1]+"]" + msg[3];
+                    case "MSGIDV TO ": {
+                        buffer = "MSG FROM [" + Chat.meuApelido + "] " + msg[2]; 
                         DatagramPacket d = new DatagramPacket(buffer.getBytes(), buffer.length(),
-                                                                group, 6789);
+                                                               Chat.pessoas.get(msg[1]) , 6799);
                         dSocket.send(d);
                         break;
                     }
@@ -64,7 +65,7 @@ public class Chat
                         break;
                     }
                     case "membros": {
-                        for (String membro : pessoas) {
+                        for (String membro : pessoas.keySet()) {
                             System.out.println(membro);
                         }
                     }
@@ -98,7 +99,7 @@ class ReceiveMulticast extends Thread
                 String[] msg = new String(p.getData(), 0, p.getLength()).split("\\[|\\]");
                 switch(msg[0]) {
                     case "JOIN ": {
-                        Chat.pessoas.add(msg[1]);
+                        Chat.pessoas.put(msg[1], p.getAddress());
                         System.out.println(msg[1] + " entrou no chat.");
                         String buffer = "JOINACK " + "[" + Chat.meuApelido +"]";
                         DatagramPacket p2 = new DatagramPacket(buffer.getBytes(), buffer.length(),
@@ -133,12 +134,13 @@ class ReceiveUnicast extends Thread {
         try {
             while(true) {
                 s.receive(p);
-                System.out.println(p.getAddress());
                 String[] msg = new String(p.getData(), 0, p.getLength()).split("\\[|\\]");
                 switch(msg[0]) {
                     case "JOINACK ": {
-                        System.out.println("joinack");
-                        Chat.pessoas.add(msg[1]);
+                        Chat.pessoas.put(msg[1], p.getAddress());
+                    }
+                    case "MSG FROM ": {
+                        System.out.println(msg[0] + "[" + msg[1] + "]" + msg[2]);
                     }
                 }
             }
