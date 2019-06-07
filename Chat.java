@@ -138,9 +138,11 @@ class ReceiveUnicast extends Thread {
                 switch(msg[0]) {
                     case "JOINACK ": {
                         Chat.pessoas.put(msg[1], p.getAddress());
+                        break;
                     }
                     case "MSG FROM ": {
                         System.out.println(msg[0] + "[" + msg[1] + "]" + msg[2]);
+                        break;
                     }
                 }
             }
